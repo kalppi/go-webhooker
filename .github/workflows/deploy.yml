@@ -1,0 +1,72 @@
+name: Deploy to GCP
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  GCP_ZONE: europe-north1-a
+  GCP_INSTANCE: terraform-instance
+  REMOTE_DIR: ~/app
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Generate SSH keys
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keygen -t rsa -b 4096 -f ~/.ssh/google_compute_engine -N "" -C ""
+
+      - name: Deploy to server
+        run: |
+          tar cz \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='.idea' \
+            --exclude='node_modules' \
+            . | gcloud compute ssh ${GCP_INSTANCE} \
+              --zone=${GCP_ZONE} \
+              --quiet \
+              --strict-host-key-checking=no \
+              --command="
+                mkdir -p ${REMOTE_DIR} &&
+                tar xz -C ${REMOTE_DIR}
+              "
+
+      - name: Run deployment script
+        run: |
+          gcloud compute ssh ${GCP_INSTANCE} \
+            --zone=${GCP_ZONE} \
+            --quiet \
+            --strict-host-key-checking=no \
+            --command="
+              cd ${REMOTE_DIR} &&
+              chmod +x scripts/deploy-server.sh &&
+              ./scripts/deploy-server.sh
+            "
+
+      - name: Get instance IP
+        run: |
+          IP=$(gcloud compute instances describe ${GCP_INSTANCE} \
+            --zone=${GCP_ZONE} \
+            --quiet \
+            --format='get(networkInterfaces[0].accessConfigs[0].natIP)')
+          echo "Deployment successful! App running at http://${IP}:8080"
