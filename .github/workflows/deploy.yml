@@ -9,6 +9,7 @@ env:
   GCP_ZONE: europe-north1-a
   GCP_INSTANCE: terraform-instance
   REMOTE_DIR: ~/app
+  APP_PORT: 8080
 
 jobs:
   terraform:
@@ -38,9 +39,13 @@ jobs:
 
       - name: Terraform Plan
         run: terraform plan -out=tfplan
+        env:
+          TF_VAR_app_port: ${{ env.APP_PORT }}
 
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
+        env:
+          TF_VAR_app_port: ${{ env.APP_PORT }}
 
   deploy:
     needs: terraform
@@ -92,7 +97,7 @@ jobs:
             --command="
               cd ${REMOTE_DIR} &&
               chmod +x scripts/deploy-server.sh &&
-              ./scripts/deploy-server.sh
+              APP_PORT=${APP_PORT} ./scripts/deploy-server.sh
             "
 
       - name: Get instance IP
@@ -101,4 +106,4 @@ jobs:
             --zone=${GCP_ZONE} \
             --quiet \
             --format='get(networkInterfaces[0].accessConfigs[0].natIP)')
-          echo "Deployment successful! App running at http://${IP}:8080"
+          echo "Deployment successful! App running at http://${IP}:${APP_PORT}"

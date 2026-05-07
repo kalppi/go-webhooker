@@ -73,7 +73,7 @@ resource "google_compute_firewall" "vm-firewall" {
 
   allow {
     protocol = "tcp"
-    ports    = ["80", "443", "8080"]
+    ports    = ["443", tostring(var.app_port)]
   }
 
   #access from anywhere (dev mode)

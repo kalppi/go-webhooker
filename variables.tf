@@ -15,3 +15,9 @@ variable "zone" {
   type        = string
   default     = "europe-north1-a"
 }
+
+variable "app_port" {
+  description = "Port the application listens on"
+  type        = number
+  default     = 8080
+}
