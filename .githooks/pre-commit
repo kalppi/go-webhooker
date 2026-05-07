@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "${REPO_ROOT}"
+
+LINTER_BIN=""
+if command -v golangci-lint >/dev/null 2>&1; then
+  LINTER_BIN="golangci-lint"
+elif [[ -x "$(go env GOPATH)/bin/golangci-lint" ]]; then
+  LINTER_BIN="$(go env GOPATH)/bin/golangci-lint"
+else
+  echo "golangci-lint is not installed. Install it with:" >&2
+  echo "  go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest" >&2
+  exit 1
+fi
+
+echo "Running golangci-lint..."
+"${LINTER_BIN}" run --timeout=5m
