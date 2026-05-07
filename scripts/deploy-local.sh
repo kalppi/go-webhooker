@@ -6,6 +6,7 @@ ZONE="europe-north1-a"
 INSTANCE="terraform-instance"
 REMOTE_DIR="~/app"
 APP_PORT="${APP_PORT:-8080}"
+APP_INTERNAL_PORT="${APP_INTERNAL_PORT:-8080}"
 
 tar cz \
   --exclude='.git' \
@@ -23,7 +24,7 @@ gcloud compute ssh ${INSTANCE} \
   --command="
     cd ${REMOTE_DIR} &&
     chmod +x scripts/deploy-server.sh &&
-    APP_PORT=${APP_PORT} ./scripts/deploy-server.sh
+    APP_PORT=${APP_PORT} APP_INTERNAL_PORT=${APP_INTERNAL_PORT} ./scripts/deploy-server.sh
   "
 
 IP=$(gcloud compute instances describe ${INSTANCE} \

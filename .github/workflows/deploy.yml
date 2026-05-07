@@ -10,6 +10,7 @@ env:
   GCP_INSTANCE: terraform-instance
   REMOTE_DIR: ~/app
   APP_PORT: 8080
+  APP_INTERNAL_PORT: 8080
 
 jobs:
   terraform:
@@ -97,7 +98,7 @@ jobs:
             --command="
               cd ${REMOTE_DIR} &&
               chmod +x scripts/deploy-server.sh &&
-              APP_PORT=${APP_PORT} ./scripts/deploy-server.sh
+              APP_PORT=${APP_PORT} APP_INTERNAL_PORT=${APP_INTERNAL_PORT} ./scripts/deploy-server.sh
             "
 
       - name: Get instance IP
