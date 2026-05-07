@@ -1,0 +1,14 @@
+run:
+  timeout: 5m
+
+linters:
+  enable:
+    - errcheck
+    - govet
+    - ineffassign
+    - staticcheck
+    - whitespace      # trailing whitespace, blank lines at start/end of blocks
+    - wsl             # blank line rules around blocks, assignments, returns
+    - nlreturn        # blank line before return statements
+    - gofmt           # standard Go formatting
+    - goimports       # import ordering and grouping
