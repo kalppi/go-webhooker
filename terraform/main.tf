@@ -39,6 +39,19 @@ resource "google_compute_firewall" "allow_api" {
   target_tags   = ["web-app"]
 }
 
+resource "google_compute_firewall" "allow_ssh" {
+  name    = "allow-ssh"
+  network = google_compute_network.vpc_network.name
+
+  allow {
+    protocol = "tcp"
+    ports    = ["22"]
+  }
+
+  source_ranges = ["0.0.0.0/0"]
+  target_tags   = ["web-app"]
+}
+
 resource "google_service_account" "vm_sa" {
   account_id   = "vm-service-account"
   display_name = "Service Account for VM"
