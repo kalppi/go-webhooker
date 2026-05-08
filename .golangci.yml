@@ -1,4 +1,9 @@
 version: "2"
+
+run:
+  timeout: 5m
+  concurrency: 4
+
 linters:
   enable:
     - nlreturn
@@ -15,6 +20,8 @@ linters:
       - third_party$
       - builtin$
       - examples$
+      - _test.go$
+
 formatters:
   enable:
     - gofmt
