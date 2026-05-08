@@ -5,8 +5,12 @@ provider "google" {
 }
 
 resource "google_compute_network" "vpc_network" {
-  name                    = "webhooker-vpc"
+  name                    = "terraform-network"
   auto_create_subnetworks = true
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "google_compute_firewall" "allow_http" {
