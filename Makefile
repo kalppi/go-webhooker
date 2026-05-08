@@ -6,8 +6,9 @@ help:
 	@echo "Build & Run:"
 	@echo "  make build           - Build all services"
 	@echo "  make build-api       - Build API service"
-	@echo "  make build-frontend  - Build Frontend service (placeholder)"
+	@echo "  make build-frontend  - Build Frontend service"
 	@echo "  make run-api         - Run API service locally"
+	@echo "  make run-frontend    - Run Frontend service locally"
 	@echo "  make test            - Run all tests"
 	@echo ""
 	@echo "Docker:"
@@ -31,11 +32,17 @@ build-api:
 
 build-frontend:
 	@echo "Building Frontend service..."
-	@echo "⚠ Frontend service not yet implemented"
+	npm --prefix services/frontend/ui install
+	npm --prefix services/frontend/ui run build
+	cd services/frontend && go build -o ../../go-frontend .
 
 run-api: build-api
 	@echo "Running API service..."
 	PORT=8080 ./go-api
+
+run-frontend: build-frontend
+	@echo "Running Frontend service..."
+	PORT=$${PORT:-3000} FRONTEND_DIST_DIR=services/frontend/ui/dist ./go-frontend
 
 docker-api:
 	docker build --target api -t go-webhooker-api:latest .
@@ -64,8 +71,8 @@ deploy-help:
 	@echo "Deploy to custom instance/zone:"
 	@echo "  INSTANCE=my-instance ZONE=europe-north1-b make deploy-api"
 	@echo ""
-	@echo "Example - Deploy frontend to port 3000:"
-	@echo "  SERVICE=frontend APP_PORT=3000 make deploy-frontend"
+	@echo "Example - Deploy frontend to port 80:"
+	@echo "  SERVICE=frontend APP_PORT=80 make deploy-frontend"
 	@echo ""
 	@echo "Environment variables:"
 	@echo "  SERVICE              - Service name (default: api or frontend)"

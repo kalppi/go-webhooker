@@ -26,7 +26,19 @@ COPY --from=builder-api /app/go-app .
 
 CMD ["/app/go-app"]
 
-# ============ Frontend Service (placeholder) ============
+# ============ Frontend Service ============
+FROM node:22-alpine AS builder-frontend-ui
+
+WORKDIR /app
+
+COPY services/frontend/ui/package*.json ./services/frontend/ui/
+RUN --mount=type=cache,target=/root/.npm \
+    npm --prefix services/frontend/ui install
+
+COPY services/frontend/ui ./services/frontend/ui
+
+RUN npm --prefix services/frontend/ui run build
+
 FROM golang:1.26.2 AS builder-frontend
 
 WORKDIR /app
@@ -37,18 +49,20 @@ RUN --mount=type=cache,target=/go/pkg/mod \
 
 COPY . .
 
-# Frontend service would be built here (when created)
-# RUN go build -o frontend-app ./services/frontend
+COPY --from=builder-frontend-ui /app/services/frontend/ui/dist ./services/frontend/ui/dist
 
-# For now, use a placeholder image
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    CGO_ENABLED=0 GOOS=linux go build -o frontend-app ./services/frontend
+
 FROM alpine:latest AS frontend
 
 WORKDIR /app
 
-# Placeholder - replace with actual frontend service when ready
-RUN echo "Frontend service not yet implemented" > message.txt
+COPY --from=builder-frontend /app/frontend-app .
+COPY --from=builder-frontend /app/services/frontend/ui/dist ./ui/dist
 
-CMD ["cat", "message.txt"]
+CMD ["/app/frontend-app"]
 
 # Default to API service
 FROM api

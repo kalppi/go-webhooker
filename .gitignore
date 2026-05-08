@@ -63,6 +63,11 @@ Thumbs.db
 
 # Dependency directories (remove if using vendor)
 # vendor/
+node_modules/
+
+# Frontend build artifacts
+services/frontend/ui/dist/
+services/frontend/ui/tsconfig.tsbuildinfo
 
 # Local development
 .local/

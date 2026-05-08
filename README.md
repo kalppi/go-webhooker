@@ -9,7 +9,7 @@ go-webhooker/
 ├── services/                 # Individual microservices
 │   ├── api/                  # Backend API service (webhooks)
 │   │   └── main.go
-│   └── frontend/             # Future frontend service
+│   └── frontend/             # Frontend service (Go + React + TypeScript)
 │
 ├── pkg/                      # Shared packages
 │   └── (shared utilities, helpers, middleware)
@@ -58,11 +58,21 @@ docker build --target api -t go-webhooker-api:latest .
 
 ### Frontend Service (`services/frontend/`)
 
-Placeholder for future frontend service (web interface, dashboard, etc.).
+Frontend service that serves a React + TypeScript single-page app.
+
+- Go server: `services/frontend/main.go`
+- React app source: `services/frontend/ui/src/`
+- Built static assets: `services/frontend/ui/dist/`
 
 **Build:**
 ```bash
 make build-frontend
+```
+
+**Run locally:**
+```bash
+make run-frontend
+# Uses PORT=3000 by default for local dev
 ```
 
 **Docker:**
@@ -109,6 +119,7 @@ docker run -p 8080:8080 -e PORT=8080 go-webhooker-api:latest
 ## Environment Variables
 
 - `PORT` - Port the service listens on (default: 8080)
+- `FRONTEND_DIST_DIR` - Optional path to built frontend assets for frontend service
 
 ## Adding a New Service
 
