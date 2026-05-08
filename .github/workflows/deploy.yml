@@ -126,10 +126,11 @@ jobs:
             --quiet \
             --strict-host-key-checking=no \
             --command="
-              cd ${REMOTE_DIR} &&
-              chmod +x scripts/deploy-server.sh &&
-              SERVICE=api APP_PORT=${APP_PORT} APP_INTERNAL_PORT=${APP_INTERNAL_PORT} ./scripts/deploy-server.sh &
-              SERVICE=frontend APP_PORT=${FRONTEND_PORT} APP_INTERNAL_PORT=${FRONTEND_INTERNAL_PORT} ./scripts/deploy-server.sh &
+              set -e
+              cd ${REMOTE_DIR}
+              chmod +x scripts/deploy-server.sh
+              (SERVICE=api APP_PORT=${APP_PORT} APP_INTERNAL_PORT=${APP_INTERNAL_PORT} ./scripts/deploy-server.sh) &
+              (SERVICE=frontend APP_PORT=${FRONTEND_PORT} APP_INTERNAL_PORT=${FRONTEND_INTERNAL_PORT} ./scripts/deploy-server.sh) &
               wait
               echo 'Both services deployed successfully'
             "
